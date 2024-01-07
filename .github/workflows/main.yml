@@ -40,23 +40,15 @@ jobs:
             curl -s -X DELETE -H "Accept: application/vnd.github.v3+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/releases/$release"
           done
           
-      - name: Create New Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release and Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: v1.0.0
-          release_name: k v1.0.0
+          name: k v1.0.0
+          body: TODO New Release.
           draft: false
           prerelease: false
-
-      - name: Upload Config File
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./router4.conf
-          asset_name: routes4.conf
-          asset_content_type: text/plain            
+          files: |
+            routes4.conf
+            routes6.conf        
