@@ -37,7 +37,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           body_path: ./routes4.conf
-          tag_name: ${{ github.ref }}
+          tag_name: v1.0.0
           
       - name: Upload router.conf
         uses: actions/upload-release-asset@v1
