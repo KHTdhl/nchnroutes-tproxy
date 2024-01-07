@@ -49,7 +49,6 @@ jobs:
         with:
           tag_name: v1.0.0
           name: k v1.0.0
-          body: TODO New Release.
           draft: false
           prerelease: false
           files: |
