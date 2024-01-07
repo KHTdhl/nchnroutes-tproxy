@@ -6,39 +6,22 @@ on:
       logLevel:
         description: 'Log level'
         required: true
-        default: 'warning'
-    push:
-      tags:
-        - "v1.0.0"
+        default: 'debug'
 
 jobs:
-  build:
+  delete_all_releases:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.x
+      - name: Delete all releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Delete all releases
+          releases=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/${{ github.repository }}/releases | jq -r '.[].id')
+          for release in $releases; do
+            curl --request DELETE --header "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/$release"
+          done
 
-      - name: Install Make
-        run: sudo apt-get install make
-
-      - name: Build Config File
-        run: make      
-          
-      - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'v1.0.0')
-        with:
-          tag_name: v1.0.0
-          name: k v1.0.0
-          body: TODO New Release.
-          draft: false
-          prerelease: false
-          files: |
-            routes4.conf
-            routes6.conf  
