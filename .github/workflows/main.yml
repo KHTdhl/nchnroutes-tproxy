@@ -1,7 +1,6 @@
-name: Delete All Releases
+name: Upload Router Config
 
 on:
-  # 手动触发事件
   workflow_dispatch:
     inputs:
       logLevel:
@@ -10,32 +9,46 @@ on:
         default: 'warning'
       tags:
         description: 'Test scenario tags'
+
 jobs:
-  delete_all_releases:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Delete all releases
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Delete all releases
-          releases=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/${{ github.repository }}/releases | jq -r '.[].id')
-          for release in $releases; do
-            curl --request DELETE --header "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/$release"
-          done
-
-      - name: Set up Python 3.x
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.x
 
-      - name: Build router configuration file
-        run: make
+      - name: Install Make
+        run: sudo apt-get install make
 
-      - name: Create new release
+      - name: Build Config File
+        run: make router.conf
+
+      - name: Delete All Releases
+        uses: actions/github-script@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const github = require('@actions/github');
+            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+            const { owner, repo } = github.context.repo;
+
+            async function deleteAllReleases() {
+              const releases = await octokit.rest.repos.listReleases({ owner, repo });
+              for (const release of releases.data) {
+                await octokit.rest.repos.deleteRelease({ owner, repo, release_id: release.id });
+              }
+            }
+
+            deleteAllReleases();
+
+      - name: Create New Release
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -46,24 +59,12 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload release asset
-        id: upload_release_asset
+      - name: Upload Config File
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./routes4.conf
+          asset_path: ./router4.conf
           asset_name: routes4.conf
-          asset_content_type: text/plain
-
-      - name: Upload release asset
-        id: upload_release_asset1
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./routes6.conf
-          asset_name: routes6.conf
           asset_content_type: text/plain
