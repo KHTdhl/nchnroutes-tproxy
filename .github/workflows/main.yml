@@ -36,7 +36,7 @@ jobs:
              routes6.conf
           name: k v1.0.0
           tag_name: v1.0.0
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
         env:
-          GITHUB_REPOSITORY: my_gh_org/my_gh_repo    
+          GITHUB_REPOSITORY: my_gh_org/my_gh_repo
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
