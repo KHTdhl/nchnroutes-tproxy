@@ -27,10 +27,7 @@ jobs:
         run: sudo apt-get install make
 
       - name: Build Config File
-        run: make
-        
-      - name: Test
-        run: cat routes4.conf        
+        run: make      
           
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
