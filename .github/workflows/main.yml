@@ -36,7 +36,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body_path: ./routes4.conf
           tag_name: v1.0.0
           
       - name: Upload router.conf
