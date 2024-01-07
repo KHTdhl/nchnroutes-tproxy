@@ -35,16 +35,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          body_path: ${{ github.workspace }}
         with:
           tag_name: v1.0.0
-          
-      - name: Upload router.conf
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./routes4.conf
-          asset_name: routes4.conf
-          asset_content_type: application/octet-stream          
+          files: |
+            routes4.conf
+            routes6.conf            
           
