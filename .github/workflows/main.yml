@@ -31,7 +31,6 @@ jobs:
           
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: v1.0.0
           name: k v1.0.0
