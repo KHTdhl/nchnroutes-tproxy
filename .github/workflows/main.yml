@@ -7,6 +7,9 @@ on:
         description: 'Log level'
         required: true
         default: 'debug'
+  push:
+    branches:
+      - main        
 
 jobs:
   delete_all_releases:
@@ -27,15 +30,23 @@ jobs:
       - name: Build router configuration file
         run: make
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: ./
-          files: |
-             routes4.conf
-             routes6.conf
-          name: k v1.0.0
-          tag_name: v1.0.0
+      - name: Create Release
+        id: create_release
+        uses: actions/gh-release@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ./routes4.conf
+          releaseName: Release ${{ github.ref }}
+          tagName: ${{ github.ref }}
+          
+      - name: Upload router.conf
+        uses: actions/upload-release-asset@v1.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./routes4.conf
+          asset_name: routes4.conf
+          asset_content_type: application/octet-stream          
           
