@@ -30,7 +30,7 @@ jobs:
         run: make
         
       - name: Test
-        run: routes4.conf        
+        run: cat routes4.conf        
 
       - name: 删除发布
         if: ${{ github.event.inputs.confirm == 'true' }}
