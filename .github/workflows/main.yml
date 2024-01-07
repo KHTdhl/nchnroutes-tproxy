@@ -1,12 +1,8 @@
 name: Upload Router Config
 
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'debug'
+  schedule:
+    - cron: '0 19 * * *'
   push:
     branches:
       - main        
